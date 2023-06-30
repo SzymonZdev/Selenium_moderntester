@@ -2,11 +2,13 @@ package tests;
 
 
 import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 import pages.BasicPages;
+
+import java.util.ArrayList;
 
 public class BasicsTests extends BaseTest {
 
@@ -100,4 +102,55 @@ public class BasicsTests extends BaseTest {
 //        browser.driver.findElement(By.id("inputPassword")).sendKeys("Password123");
 //        browser.driver.switchTo().defaultContent();
 //    }
+
+    //                              <<<<<<Tables>>>>>>
+    // 4 - Table test
+    @Test
+    public void table_test() {
+        BasicPages basicPages = new BasicPages(browser);
+        basicPages.go("table.php");
+        ArrayList<String> allRows = (ArrayList<String>) basicPages.getAllRowsTextFromTable();
+        int allRowsCounter = 0;
+        for (String row : allRows
+             ) {
+            allRowsCounter++;
+        }
+        ArrayList<String> selectedRows = (ArrayList<String>) basicPages.getRowsTextFromTableByCountryAndHeight("Switzerland", 4000);
+        int selectedRowsCounter = 0;
+        for (String row : selectedRows
+        ) {
+            selectedRowsCounter++;
+        }
+
+        SoftAssert softAssert = new SoftAssert();
+        softAssert.assertEquals(13, allRowsCounter);
+        softAssert.assertEquals(6, selectedRowsCounter);
+        softAssert.assertAll();
+    }
+
+
+    //                              <<<<<<Windows & Tabs>>>>>>
+    // 5 - Windows/Tabs test
+    @Test
+    public void window_and_tab_test() {
+        BasicPages basicPages = new BasicPages(browser);
+        basicPages.go("windows-tabs.php");
+        String mainHandle = browser.driver.getWindowHandle();
+        basicPages.clickNewBrowserWindowButton();
+        browser.switchToNewlyOpenedHandle(mainHandle);
+        table_test();
+        browser.closeNewHandleAndGoBackToOriginal(mainHandle);
+
+        basicPages.clickNewMessageWindowButton();
+        browser.switchToNewlyOpenedHandle(mainHandle);
+        System.out.println(basicPages.getNewWindowText());
+        Assert.assertEquals(basicPages.getNewWindowText(),
+                "Knowledge increases by sharing but not by saving. Please share this website with your friends and in your organization.");
+        browser.closeNewHandleAndGoBackToOriginal(mainHandle);
+
+        basicPages.clickNewBrowserTabButton();
+        browser.switchToNewlyOpenedHandle(mainHandle);
+        table_test();
+        browser.closeNewHandleAndGoBackToOriginal(mainHandle);
+    }
 }

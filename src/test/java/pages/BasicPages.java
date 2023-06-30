@@ -8,6 +8,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.Select;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -52,6 +53,20 @@ public class BasicPages extends BasePage {
     WebElement submitButton;
     @FindBy(css = "#validator-message")
     WebElement submitMessageField;
+    @FindBy(css = "tbody tr")
+    List<WebElement> rows;
+    @FindBy(css = "#newBrowserWindow")
+    WebElement newBrowserWindowButton;
+    @FindBy(css = "#newMessageWindow")
+    WebElement newMessageButton;
+    @FindBy(css = "#newBrowserTab")
+    WebElement newBrowserTabButton;
+    @FindBy(css = "body")
+    WebElement newWindowText;
+    @FindBy(css = "#scroll-button")
+    WebElement submitScrollButton;
+    @FindBy(className = "show-button")
+    WebElement submitScrollButtonParagraph;
 
 
     public BasicPages(Browser browser) {
@@ -158,5 +173,69 @@ public class BasicPages extends BasePage {
 
     public String getSubmitMessageText() {
         return submitMessageField.getText();
+    }
+
+    public List<String> getAllRowsTextFromTable() {
+        List<String> allRows = new ArrayList<>();
+        int index = 1;
+        for (WebElement row: rows
+             ) {
+            StringBuilder rowBuilder = new StringBuilder();
+            List<WebElement> columns = row.findElements(By.cssSelector("td"));
+            rowBuilder.append(index++).append(" - ");
+            for (WebElement column : columns) {
+                rowBuilder.append(column.getText()).append(", ");
+            }
+            rowBuilder.delete(rowBuilder.length()-2, rowBuilder.length());
+            allRows.add(rowBuilder.toString());
+        }
+        return allRows;
+    }
+    public List<String> getRowsTextFromTableByCountryAndHeight(String country, int minHeight) {
+        List<String> selectedRows = new ArrayList<>();
+        int rank = 1;
+        for (WebElement row: rows
+             ) {
+            StringBuilder rowBuilder = new StringBuilder();
+            List<WebElement> columns = row.findElements(By.cssSelector("td"));
+            boolean correctCountry = false;
+            boolean correctHeight = false;
+            for (WebElement column : columns) {
+                rowBuilder.append(column.getText()).append(", ");
+                if (column.getText().contains(country)) {
+                    correctCountry = true;
+                }
+                try {
+                    if (Integer.parseInt(column.getText()) > minHeight) {
+                        correctHeight = true;
+                    }
+                } catch (NumberFormatException ignored){}
+            }
+            if (correctHeight && correctCountry) {
+                rowBuilder.delete(rowBuilder.length()-2, rowBuilder.length());
+                selectedRows.add(rowBuilder.toString());
+            }
+            rank++;
+        }
+        return selectedRows;
+    }
+
+    public void clickNewBrowserWindowButton() {
+        newBrowserWindowButton.click();
+    }
+    public void clickNewMessageWindowButton() {
+        newMessageButton.click();
+    }
+    public void clickNewBrowserTabButton() {
+        newBrowserTabButton.click();
+    }
+    public String getNewWindowText() {
+        return newWindowText.getText();
+    }
+    public boolean scrollSubmitButtonIsClickable() {
+        return submitScrollButton.isEnabled() && submitScrollButton.isDisplayed();
+    }
+    public WebElement getSubmitScrollButtonParagraph() {
+        return submitScrollButtonParagraph;
     }
 }
