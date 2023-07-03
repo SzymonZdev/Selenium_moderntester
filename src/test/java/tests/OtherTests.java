@@ -7,7 +7,7 @@ import pages.BasicPages;
 
 import java.io.IOException;
 
-public class OtherTests extends BasicsTests{
+public class OtherTests extends BaseTest{
 
     //                              <<<<<<Java Executor>>>>>>
     // 1 - "High Site" - js scroll test

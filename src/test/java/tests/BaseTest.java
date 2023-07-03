@@ -8,7 +8,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
 public class BaseTest {
-    Browser browser;
+    protected Browser browser;
 
     @BeforeMethod
     public void setUp() {
