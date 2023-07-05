@@ -98,9 +98,6 @@ public class InteractionPages extends BasePage {
             actions.moveByOffset(0,  (firstElementLocationY + (i * 35)) - currentElement.getLocation().y);
             actions.perform();
         }
-
-
-
         return this;
     }
 

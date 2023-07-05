@@ -18,7 +18,7 @@ public class WidgetsTests extends BaseTest{
     }
 
     //                              <<<<<<Accordion>>>>>>
-    // 1 - Accordion test
+    // - Accordion test
     @Test
     public void accordion_all_sections_test() {
         WidgetsPages widgetsPages = new WidgetsPages(browser);
@@ -51,7 +51,7 @@ public class WidgetsTests extends BaseTest{
     }
 
     //                              <<<<<<Autocomplete>>>>>>
-    // 1 - Autocomplete test
+    // - Autocomplete test
     // Test inputs a specific value, chooses a random option,
     // then check if that option's value is in the search bar
     @Test
@@ -65,7 +65,7 @@ public class WidgetsTests extends BaseTest{
     }
 
     //                              <<<<<<Datepicker>>>>>>
-    // 1 - Datepicker test
+    // - Datepicker test
     //    30.10.2018
     //    25.09.2018
     //    25.09.2018 (yes, again the same date)
@@ -107,7 +107,7 @@ public class WidgetsTests extends BaseTest{
     }
 
     //                              <<<<<<Modal dialog>>>>>>
-    // 1 - Modal dialog test with DataProvider
+    // - Modal dialog test with DataProvider
     @Test(dataProvider = "modal-user-data")
     public void fill_modal_dialog_form_test(String name, String email, String password) {
         WidgetsPages widgetsPages = new WidgetsPages(browser);
@@ -120,7 +120,7 @@ public class WidgetsTests extends BaseTest{
     }
 
     //                              <<<<<<Progress bar>>>>>>
-    // 1 - Progress Bar Test
+    // - Progress Bar Test
     @Test
     public void wait_till_progress_bar_finishes_test() {
         WidgetsPages widgetsPages = new WidgetsPages(browser);
@@ -128,5 +128,50 @@ public class WidgetsTests extends BaseTest{
                 .waitTillProgressBarFinishes();
 
         Assert.assertEquals(widgetsPages.getProgressBarText(), "Complete!");
+    }
+
+    //                              <<<<<<Selectable>>>>>>
+    // - Select menus test
+    @Test
+    public void several_selects_test() {
+        WidgetsPages widgetsPages = new WidgetsPages(browser);
+        widgetsPages.go("selectmenu.php")
+                .selectRandomSpeed()
+                .selectFileByTextcontent("Some other file with a very long option text")
+                .selectNumberByIndex(3)
+                .selectRandomTitle();
+    }
+
+    //                              <<<<<<Slider>>>>>>
+    // - Slider test
+    @Test
+    public void slider_test() {
+        WidgetsPages widgetsPages = new WidgetsPages(browser);
+        widgetsPages.go("slider.php")
+                .moveSliderToValue(20);
+
+        Assert.assertEquals(widgetsPages.getSliderValue(), 20);
+        widgetsPages.moveSliderToValue(80);
+
+        Assert.assertEquals(widgetsPages.getSliderValue(), 80);
+        widgetsPages.moveSliderToValue(80);
+
+        Assert.assertEquals(widgetsPages.getSliderValue(), 80);
+        widgetsPages.moveSliderToValue(20);
+
+        Assert.assertEquals(widgetsPages.getSliderValue(), 20);
+        widgetsPages.moveSliderToValue(0);
+
+        Assert.assertEquals(widgetsPages.getSliderValue(), 0);
+    }
+
+    //                              <<<<<<Tooltip>>>>>>
+    // - Tooltip test
+    @Test
+    public void tooltip_test() {
+        WidgetsPages widgetsPages = new WidgetsPages(browser);
+        widgetsPages.go("tooltip.php");
+
+        Assert.assertEquals(widgetsPages.getTooltipText(), "We ask for your age only for statistical purposes.");
     }
 }

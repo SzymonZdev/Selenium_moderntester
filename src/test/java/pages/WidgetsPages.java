@@ -2,12 +2,15 @@ package pages;
 
 import helpers.Browser;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.interactions.KeyInput;
 import org.openqa.selenium.support.FindAll;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.LocalDate;
@@ -46,6 +49,29 @@ public class WidgetsPages extends BasePage {
     WebElement existingUsersTable;
     @FindBy(css = "#progressbar")
     WebElement progressBar;
+    @FindBy(css = "ul#speed-menu")
+    WebElement speedSelect;
+    @FindBy(css = "#speed-button")
+    WebElement speedSelectSpan;
+    @FindBy(css = "ul#files-menu")
+    WebElement fileSelect;
+    @FindBy(css = "#files-button")
+    WebElement fileSelectButton;
+    @FindBy(css = "ul#number-menu")
+    WebElement numberSelect;
+    @FindBy(css = "#number-button")
+    WebElement numberSelectButton;
+    @FindBy(css = "ul#salutation-menu")
+    WebElement salutationSelect;
+    @FindBy(css = "#salutation-button")
+    WebElement salutationSelectButton;
+    @FindBy(css = "#custom-handle")
+    WebElement slider;
+    @FindBy(css = "div.ui-tooltip")
+    WebElement tooltip;
+    @FindBy(css = "#age")
+    WebElement tooltipInput;
+
 
     public WidgetsPages(Browser browser) {
         super(browser);
@@ -228,4 +254,70 @@ public class WidgetsPages extends BasePage {
         return progressBar.getText();
     }
 
+    public WidgetsPages selectRandomSpeed() {
+        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.tagName("select")));
+        speedSelectSpan.click();
+        wait.until(ExpectedConditions.visibilityOfAllElements(speedSelect.findElements(By.tagName("li"))));
+        browser.getRandomWebElement(speedSelect.findElements(By.tagName("li"))).click();
+
+        return this;
+    }
+
+    public WidgetsPages selectFileByTextcontent(String textContent) {
+        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.tagName("select")));
+        fileSelectButton.click();
+        wait.until(ExpectedConditions.visibilityOfAllElements(fileSelect.findElements(By.tagName("li"))))
+                .stream().filter(e -> e.getAttribute("textContent").equals(textContent))
+                .findFirst().get().click();
+
+        return this;
+    }
+
+    public WidgetsPages selectNumberByIndex(int index) {
+        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.tagName("select")));
+        numberSelectButton.click();
+        List<WebElement> list = wait.until(ExpectedConditions.visibilityOfAllElements(numberSelect.findElements(By.tagName("li"))));
+        list.get(index).click();
+
+        return this;
+    }
+
+    public WidgetsPages selectRandomTitle() {
+        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.tagName("select")));
+        salutationSelectButton.click();
+        wait.until(ExpectedConditions.visibilityOfAllElements(salutationSelect.findElements(By.tagName("li"))));
+        browser.getRandomWebElement(salutationSelect.findElements(By.cssSelector("li:not(.ui-state-disabled)"))).click();
+
+        return this;
+    }
+
+    public WidgetsPages moveSliderToValue(int intendedValue) {
+        int currentSliderValue = Integer.parseInt(slider.getAttribute("textContent"));
+        if (currentSliderValue > intendedValue) {
+            slider.click();
+            int difference = currentSliderValue - intendedValue;
+            for (int i = 0; i < difference; i++) {
+                slider.sendKeys(Keys.LEFT);
+            }
+        } else if (currentSliderValue < intendedValue) {
+            slider.click();
+            int difference = intendedValue - currentSliderValue;
+            for (int i = 0; i < difference; i++) {
+                slider.sendKeys(Keys.RIGHT);
+            }
+        }
+
+        return this;
+    }
+
+    public int getSliderValue() {
+        return Integer.parseInt(slider.getAttribute("textContent"));
+    }
+
+    public String getTooltipText() {
+        Actions actions = new Actions(driver);
+        actions.moveToElement(tooltipInput).perform();
+
+        return tooltip.getText();
+    }
 }
