@@ -8,6 +8,7 @@ import org.openqa.selenium.support.FindAll;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,6 +44,8 @@ public class WidgetsPages extends BasePage {
     WebElement modalCreateAccountButton;
     @FindBy(css = "#users tbody")
     WebElement existingUsersTable;
+    @FindBy(css = "#progressbar")
+    WebElement progressBar;
 
     public WidgetsPages(Browser browser) {
         super(browser);
@@ -64,7 +67,8 @@ public class WidgetsPages extends BasePage {
             if (index != 0) {
                 actions.click(section).perform();
             }
-            allText[index++] = wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector("h3.ui-accordion-header-active+div")))).getText();
+            wait.until(ExpectedConditions.attributeToBe(section, "aria-selected", "true"));
+            allText[index++] = wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector("h3.ui-accordion-header-active+div")))).getAttribute("textContent");
         }
         return allText;
     }
@@ -174,7 +178,7 @@ public class WidgetsPages extends BasePage {
             WebElement menuOption = currentMenu.findElements(By.cssSelector(".ui-menu-item"))
                     .stream().filter(e -> e.getAttribute("textContent").contains(option))
                     .findFirst().get();
-            menuOption.click();
+            wait.until(ExpectedConditions.elementToBeClickable(menuOption)).click();
             currentMenu = menuOption;
         }
         return this;
@@ -212,4 +216,16 @@ public class WidgetsPages extends BasePage {
         }
         return newUserPresent;
     }
+
+    public WidgetsPages waitTillProgressBarFinishes() {
+        // Overwriting to make timeout longer
+        wait = new WebDriverWait(driver, 25);
+        wait.until(ExpectedConditions.attributeToBe(progressBar, "innerText", "Complete!"));
+        return this;
+    }
+
+    public String getProgressBarText() {
+        return progressBar.getText();
+    }
+
 }
