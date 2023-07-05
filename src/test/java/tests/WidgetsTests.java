@@ -1,15 +1,21 @@
 package tests;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 import pages.WidgetsPages;
 
-import java.util.Date;
 
 public class WidgetsTests extends BaseTest{
+    @DataProvider(name = "modal-user-data")
+    public Object[][] dataProvFunc() {
+        return new Object[][] {
+                {"John Doe", "john@doe.com", "password123"},
+                {"Michael Cera", "michael@cera.com", "password"}
+        };
+    }
 
     //                              <<<<<<Accordion>>>>>>
     // 1 - Accordion test
@@ -47,6 +53,12 @@ public class WidgetsTests extends BaseTest{
 
     //                              <<<<<<Datepicker>>>>>>
     // 1 - Datepicker test
+    //    30.10.2018
+    //    25.09.2018
+    //    25.09.2018 (yes, again the same date)
+    //    01.01.2018
+    //    01.02.2018
+    //    Today -> done long way round, clicking through calendar using regex to compare with expected
     @Test
     public void select_several_dates_test() {
         WidgetsPages widgetsPages = new WidgetsPages(browser);
@@ -70,5 +82,27 @@ public class WidgetsTests extends BaseTest{
         widgetsPages.goToTodaysDate();
 
         Assert.assertEquals(widgetsPages.getDatepickerValue(), widgetsPages.getTodaysDate());
+    }
+
+    //                              <<<<<<Menu>>>>>>
+    // 1 - Menu test
+    @Test
+    public void click_on_value_in_menu_test() {
+        WidgetsPages widgetsPages = new WidgetsPages(browser);
+        widgetsPages.go("menu-item.php")
+                .clickThroughMenuOptions("Music", "Jazz", "Modern");
+    }
+
+    //                              <<<<<<Modal dialog>>>>>>
+    // 1 - Modal dialog test with DataProvider
+    @Test(dataProvider = "modal-user-data")
+    public void fill_modal_dialog_form_test(String name, String email, String password) {
+        WidgetsPages widgetsPages = new WidgetsPages(browser);
+        widgetsPages.go("modal-dialog.php")
+                .openModalDialogForm()
+                .fillModalForm(name, email, password)
+                .submitModalForm();
+
+        Assert.assertTrue(widgetsPages.checkForNewUser(name, email, password));
     }
 }

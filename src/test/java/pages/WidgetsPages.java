@@ -12,10 +12,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Formatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class WidgetsPages extends BasePage {
     @FindBy(css = "#accordion")
@@ -32,6 +29,20 @@ public class WidgetsPages extends BasePage {
     WebElement datepickerHeader;
     @FindBy(css = "tr td")
     List<WebElement> datepickerDays;
+    @FindBy(css = "ul#menu")
+    WebElement menu;
+    @FindBy(css = "#create-user")
+    WebElement createNewUserButton;
+    @FindBy(css = "#name")
+    WebElement modalName;
+    @FindBy(css = "#email")
+    WebElement modalEmail;
+    @FindBy(css = "#password")
+    WebElement modalPassword;
+    @FindBy(xpath = "//button[text() ='Create an account']")
+    WebElement modalCreateAccountButton;
+    @FindBy(css = "#users tbody")
+    WebElement existingUsersTable;
 
     public WidgetsPages(Browser browser) {
         super(browser);
@@ -144,16 +155,9 @@ public class WidgetsPages extends BasePage {
         months.put(10, "October");
         months.put(11, "November");
         months.put(12, "December");
+        String expectedHeader = months.get(currentMonth) + currentYear;
 
-        StringBuilder expectedHeader = new StringBuilder()
-                .append(months.get(currentMonth))
-                .append(" ")
-                .append(currentYear);
-
-        System.out.println(getDatepickerHeaderValue().);
-        System.out.println(expectedHeader);
-
-        return getDatepickerHeaderValue().contentEquals(expectedHeader);
+        return getDatepickerHeaderValue().replaceAll("[\\s|\\u00A0]+", "").contentEquals(expectedHeader);
     }
 
     public String getTodaysDate() {
@@ -161,5 +165,51 @@ public class WidgetsPages extends BasePage {
     }
     public String getDatepickerHeaderValue() {
         return datepickerHeader.getAttribute("textContent");
+    }
+
+    public WidgetsPages clickThroughMenuOptions(String... options) {
+        WebElement currentMenu = menu;
+        for (String option: options
+             ) {
+            WebElement menuOption = currentMenu.findElements(By.cssSelector(".ui-menu-item"))
+                    .stream().filter(e -> e.getAttribute("textContent").contains(option))
+                    .findFirst().get();
+            menuOption.click();
+            currentMenu = menuOption;
+        }
+        return this;
+    }
+
+    public WidgetsPages openModalDialogForm() {
+        createNewUserButton.click();
+        return this;
+    }
+
+    public WidgetsPages fillModalForm(String name, String email, String password) {
+        modalName.clear();
+        modalName.sendKeys(name);
+        modalEmail.clear();
+        modalEmail.sendKeys(email);
+        modalPassword.clear();
+        modalPassword.sendKeys(password);
+        return this;
+    }
+
+    public WidgetsPages submitModalForm() {
+        modalCreateAccountButton.click();
+        return this;
+    }
+
+    public boolean checkForNewUser(String name, String email, String password) {
+        WebElement lastRow = existingUsersTable.findElement(By.cssSelector("tr:last-of-type"));
+        List<WebElement> columns = lastRow.findElements(By.cssSelector("td"));
+        boolean newUserPresent = columns.get(0).getText().equals(name);
+        if (!columns.get(1).getText().equals(email)) {
+                newUserPresent = false;
+            }
+        if (!columns.get(2).getText().equals(password)) {
+            newUserPresent = false;
+        }
+        return newUserPresent;
     }
 }
